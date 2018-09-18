@@ -1,5 +1,12 @@
 # DietNN
 Tool to reduce the size of Neural Networks
+ToDo:
+- Train Models (VGG16 and AlexNet in tensorflow)
+- Save Models (get files of parameters) 
+- Create program to extract paramteres
+- Prune parameters
+- load paramters to Model/ create Model from parameters
+- Run Model (inference)
 
 ## Motivation for this project format:
 - **src** : Put all source code for production within structured directory
