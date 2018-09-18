@@ -1,5 +1,5 @@
-# Insight_Project_Framework
-Framework for machine learning projects at Insight Data Science. 
+# DietNN
+Tool to reduce the size of Neural Networks
 
 ## Motivation for this project format:
 - **src** : Put all source code for production within structured directory
@@ -12,8 +12,8 @@ Framework for machine learning projects at Insight Data Science.
 ## Setup
 Clone repository and update python path
 ```
-repo_name=Insight_Project_Framework # URL of your new repository
-username=mrubash1 # Username for your personal github account
+repo_name=dietNN # URL of your new repository
+username=atinzad # Username for your personal github account
 git clone https://github.com/$username/$repo_name
 cd $repo_name
 echo "export $repo_name=${PWD}" >> ~/.bash_profile
@@ -22,7 +22,7 @@ source ~/.bash_profile
 ```
 Create new development branch and switch onto it
 ```
-branch_name=dev-readme_requisites-20180905 # Name of development branch, of the form 'dev-feature_name-date_of_creation'}}
+branch_name=dev-readme_requisites-20180917 # Name of development branch, of the form 'dev-feature_name-date_of_creation'}}
 git checkout -b $branch_name
 git push origin $branch_name
 ```
