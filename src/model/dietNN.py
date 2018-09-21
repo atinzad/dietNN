@@ -100,7 +100,7 @@ if __name__ == "__main__":
     saved_model.save_weights("model_small.h5")
     print("Saved model to disk")
     try:
-        plot_model(saved_model, to_file='vgg_small.png')
+        plot_model(saved_model, to_file='model_small.png')
     except:
         pass
         
