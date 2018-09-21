@@ -42,5 +42,5 @@ if __name__ == "__main__":
     number_of_params_to_prune = precent_of_prunning/100* loaded_model.count_params()
     
     
-    for i to range(number_of_params_to_prune):
+    for i in range(number_of_params_to_prune):
         pass
