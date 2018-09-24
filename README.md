@@ -1,12 +1,14 @@
 # DietNN
 Tool to reduce the size of Neural Networks
+
 ToDo:
-- Train Models (VGG16 and AlexNet in tensorflow)
-- Save Models (get files of parameters) 
-- Create program to extract paramteres
-- Prune parameters
-- load paramters to Model/ create Model from parameters
+- Train Models in Keras (get accuracy)
 - Run Model (inference)
+- Add data (imagenet) to the pipeline
+- Run data in dietNN to check accuracy
+- Have examples in tests
+- Refactor dienNN.py
+- Add requirments.txt file
 
 ## Motivation for this project format:
 - **src** : Put all source code for production within structured directory
@@ -35,13 +37,17 @@ git push origin $branch_name
 ```
 
 ## Requisites
-- List all packages and software needed to build the environment
-- This could include cloud command line tools (i.e. gsutil), package managers (i.e. conda), etc.
+- Tensorflow 1.10.1 (pip install tensorflow #for latest version)
+- numpy 1.14.3 (pip install numpy #for latest version)
+- keras 2.2.2 (pip install keras #for latest version)
+- kerassurgeon 0.1.1 (pip install kerassurgeon #for latest version)
+- **Optional**: graphViz (sudo apt-get install graphviz)
+- **Optional**: pydot 1.2.4 (pip install pydot #for latest version)
+
 ```
-# Example
-- A
-- B
-- C
+# To install Requisits
+cd $repo_name
+pip install -r requirements.txt
 ```
 
 ## Build Environment

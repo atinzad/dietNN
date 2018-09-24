@@ -26,15 +26,15 @@ def build_parser():
 #python dietNN.py --m /home/atinzad/dietNN/data/raw/model.json --w /home/atinzad/dietNN/data/raw/model.h5 --c 30
 
 if __name__ == "__main__":
-#    parser = build_parser()
-#    options = parser.parse_args()
-#    model_load_path = options.model_load_path
-#    weights_load_path = options.weights_load_path
-#    precent_of_prunning = options.precent_of_prunning
+    parser = build_parser()
+    options = parser.parse_args()
+    model_load_path = options.model_load_path
+    weights_load_path = options.weights_load_path
+    precent_of_prunning = options.precent_of_prunning
     
-    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
-    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
-    precent_of_prunning = 1
+#    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
+#    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
+#    precent_of_prunning = 1
     
     print (model_load_path)
     print (weights_load_path)
