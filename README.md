@@ -8,7 +8,6 @@ ToDo:
 - Run data in dietNN to check accuracy
 - Have examples in tests
 - Refactor dienNN.py
-- Add requirments.txt file
 
 ## Motivation for this project format:
 - **src** : Put all source code for production within structured directory
@@ -74,7 +73,7 @@ exit()
 ## Fetch and create h5 parameter file and json model file
 cd ~/dietNN/data/raw
 python create_models.py #this will create model.json (in KB range) and model.h5 (in MB range)
-```
+
 
 ## Run dietNN.py
 #example on model.json and model.h5 with reduction request of ~1% in footprint
@@ -150,3 +149,4 @@ python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
 # Step 1
 # Step 2
 ```
+
