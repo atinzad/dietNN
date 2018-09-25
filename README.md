@@ -49,8 +49,8 @@ git push origin $branch_name
 - Kerassurgeon 0.1.1 (pip install kerassurgeon #for latest version)
 - **Optional**: GraphViz (sudo apt-get install graphviz)
 - **Optional**: Pydot 1.2.4 (pip install pydot #for latest version)
-
 ```
+
 ## To install Requisits
 cd $repo_name
 pip install -r requirements.txt
