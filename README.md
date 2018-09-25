@@ -23,7 +23,12 @@ Clone repository and update python path
 ```
 repo_name=dietNN # URL of your new repository
 username=atinzad # Username for your personal github account
+#Clone master
 git clone https://github.com/$username/$repo_name
+#Or clone a particular branch
+my_branch=setup_20180918
+git clone -b $my_branch https://github.com/$username/$repo_name
+
 cd $repo_name
 echo "export $repo_name=${PWD}" >> ~/.bash_profile
 echo "export PYTHONPATH=$repo_name/src:${PYTHONPATH}" >> ~/.bash_profile
@@ -37,18 +42,46 @@ git push origin $branch_name
 ```
 
 ## Requisites
+- Python 3.6.5
 - Tensorflow 1.10.1 (pip install tensorflow #for latest version)
-- numpy 1.14.3 (pip install numpy #for latest version)
-- keras 2.2.2 (pip install keras #for latest version)
-- kerassurgeon 0.1.1 (pip install kerassurgeon #for latest version)
-- **Optional**: graphViz (sudo apt-get install graphviz)
-- **Optional**: pydot 1.2.4 (pip install pydot #for latest version)
+- Numpy 1.14.3 (pip install numpy #for latest version)
+- Keras 2.2.2 (pip install keras #for latest version)
+- Kerassurgeon 0.1.1 (pip install kerassurgeon #for latest version)
+- **Optional**: GraphViz (sudo apt-get install graphviz)
+- **Optional**: Pydot 1.2.4 (pip install pydot #for latest version)
 
 ```
-# To install Requisits
+## To install Requisits
 cd $repo_name
 pip install -r requirements.txt
+
+#Once done make sure Tensorflow as running as backend (most likely it is)
+#In python, import keras then go back to shell (this will create keras.json config file)
+python
+import keras
+exit()
+
+#Edit $HOME/.keras/keras.json
+{
+    "image_data_format": "channels_last",
+    "epsilon": 1e-07,
+    "floatx": "float32",
+    "backend": "tensorflow"
+}
+
 ```
+
+## Fetch and create h5 parameter file and json model file
+cd ~/dietNN/data/raw
+python create_models.py #this will create model.json (in KB range) and model.h5 (in MB range)
+```
+
+## Run dietNN.py
+#example on model.json and model.h5 with reduction request of ~1% in footprint
+cd ~/dietNN/src/model
+python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
+# model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
+#Note that model_small.h5 is ~1% smaller than model.h5
 
 ## Build Environment
 - Include instructions of how to launch scripts in the build subfolder
