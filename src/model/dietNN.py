@@ -24,17 +24,57 @@ def build_parser():
 
 
 #python dietNN.py --m /home/atinzad/dietNN/data/raw/model.json --w /home/atinzad/dietNN/data/raw/model.h5 --c 30
+    
+
+def prune(model, layer, rand=True,no_of_weights=0, weights=[]):
+    try:
+        if 'units' in layer.get_config():
+            maxn=layer.get_config()['units']
+        elif 'filters' in layer.get_config():
+            maxn=layer.get_config()['filters']
+    except:
+        print ("layer is not a dense or conv layer")
+        return model
+        
+    if rand:
+        if no_of_weights==0:
+            print ("did not specifiy no_of_weights")
+            return model
+        elif no_of_weights >= maxn:
+            print ("number_of_weights greater than or equal to what is supported by layer")
+            return model
+        else:
+            data = list(range(maxn))
+            random.shuffle(data)
+            weights = [data[i] for i in range(no_of_weights)]
+            
+    else:
+        if len(weights)==0:
+            print ("did not specifiy weights")
+            return model
+        elif max(weights) > maxn:
+            print ("at least one of the weights is out of bounds")
+            return model
+
+    model = delete_channels(model, layer, weights)
+    return model
+                
+            
+        
+        
+        
+    
 
 if __name__ == "__main__":
-    parser = build_parser()
-    options = parser.parse_args()
-    model_load_path = options.model_load_path
-    weights_load_path = options.weights_load_path
-    precent_of_prunning = options.precent_of_prunning
+#    parser = build_parser()
+#    options = parser.parse_args()
+#    model_load_path = options.model_load_path
+#    weights_load_path = options.weights_load_path
+#    precent_of_prunning = options.precent_of_prunning
     
-#    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
-#    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
-#    precent_of_prunning = 1
+    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
+    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
+    precent_of_prunning = 30
     
     print (model_load_path)
     print (weights_load_path)
@@ -55,45 +95,36 @@ if __name__ == "__main__":
     
     saved_model = copy.copy(loaded_model)
     
-    trainable_layers = [layer for layer in saved_model.layers if len(layer.trainable_weights)>0]
+    print (saved_model.summary())
     
-    trainable_layers_max=[0]*len(trainable_layers)
-    
-    for i, layer in enumerate(trainable_layers):
-        if 'units' in layer.get_config():
-            trainable_layers_max[i]=(layer,layer.get_config()['units'])
-        elif 'filters' in layer.get_config():
-            trainable_layers_max[i]=(layer,layer.get_config()['filters'])
-            
-        
     while saved_model.count_params() > final_size:
-        
-        current_no = saved_model.count_params()
-        #randomly choose a layer
-        layer, maxn =random.choice(trainable_layers_max)
-        
-        #randomly choose a parameter
-        i = random.randint(0,maxn-1)
-        
-        try:
-            saved_model = delete_channels(saved_model, layer, [i])
-        except:
-            pass
-        
-        print (saved_model.count_params(),layer.name, i)
-        
-        if current_no == saved_model.count_params():
-            trainable_layers = [layer for layer in saved_model.layers if len(layer.trainable_weights)>0]
     
-            trainable_layers_max=[0]*len(trainable_layers)
-    
-            for i, layer in enumerate(trainable_layers):
+        trainable_layers = [layer for layer in saved_model.layers if len(layer.trainable_weights)>0]
+        
+            
+        for layer in trainable_layers:
+            
+            try:
                 if 'units' in layer.get_config():
-                    trainable_layers_max[i]=(layer,layer.get_config()['units'])
+                    maxn=layer.get_config()['units']
                 elif 'filters' in layer.get_config():
-                    trainable_layers_max[i]=(layer,layer.get_config()['filters'])
+                    maxn=layer.get_config()['filters']
+            except:
+                print ("layer is not a dense or conv layer")
+                continue
+            
+            
+            try:
+                saved_model = prune(saved_model, layer, rand=True, no_of_weights=int(precent_of_prunning/100*maxn))
+            except:
+                print ("could not process", layer.get_config()['name'])
+            
+            if saved_model.count_params() <= final_size:
+                break
+    
 
-
+    print (saved_model.summary())
+    
     model_json = saved_model.to_json()
     with open("model_small.json", "w") as json_file:
         json_file.write(model_json)
