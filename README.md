@@ -79,6 +79,7 @@ python create_models.py #this will create model.json (in KB range) and model.h5 
 #example on model.json and model.h5 with reduction request of ~1% in footprint
 cd ~/dietNN/src/model
 python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
+```
 # model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
 #Note that model_small.h5 is ~1% smaller than model.h5
 
@@ -88,7 +89,7 @@ python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
 - The purpose of these scripts is to build a standalone environment, for running the code in this repository
 - The environment can be for local use, or for use in a cloud environment
 - If using for a cloud environment, commands could include CLI tools from a cloud provider (i.e. gsutil from Google Cloud Platform)
-```
+
 # Example
 
 # Step 1
@@ -149,4 +150,5 @@ python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
 # Step 1
 # Step 2
 ```
+
 
