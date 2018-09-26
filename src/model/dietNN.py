@@ -4,13 +4,15 @@ from keras.models import load_model
 from keras.models import model_from_json
 from kerassurgeon.operations import delete_channels
 from keras.utils.vis_utils import plot_model
+from keras import layers
 import copy
 import random
 
 
 
 def build_parser():
-    par = ArgumentParser()
+    #par = ArgumentParser()
+    par = ArgumentParser(fromfile_prefix_chars='@')
     par.add_argument('--m', type=str,
                      dest='model_load_path', help='filepath to load model in json format', required=True, 
                      default="/home/atinzad/dietNN/data/raw/model.json")
@@ -19,6 +21,8 @@ def build_parser():
                      default="/home/atinzad/dietNN/data/raw/model.h5")
     par.add_argument('--c', type=int,
                     dest='precent_of_prunning', help='percent of parameters to be prunned', required=True, default = 30)
+    par.add_argument('--q', type=bool,
+                    dest='invoke quantization', help='True if quantization', required=True, default = False)
 
     return par
 
@@ -60,21 +64,63 @@ def prune(model, layer, rand=True,no_of_weights=0, weights=[]):
     return model
                 
             
-        
+def quantize(model, layer) :
+    weights = layer.get_weights()
+    new_weights=copy.copy(weights)
+    for i,w in enumerate(weights):
+        new_weights[i]= w.astype('float16')
+        new_weights[i] = new_weights[i]+1
+    for i,l in enumerate(model.layers):
+        if l.name == layer.name:
+            my_i = i
+            break
+    
+    config = layer.get_config()
+    new_layer = layers.deserialize({'class_name': layer.__class__.__name__,
+                            'config': config})
+    
+    new_layer.set_weights(new_weights)
+    
+    model = replace_intermediate_layer_in_keras(model, my_i, new_layer)
+    
+    
+    #model.layers[my_i].set_weights(new_weights)
+    #model.get_layer(name=layer.name).set_weights(new_weights)
+    return model
+    
+    
+def replace_intermediate_layer_in_keras(model, layer_id, new_layer):
+    from keras.models import Model
+
+    layers = [l for l in model.layers]
+
+    x = layers[0].output
+    for i in range(1, len(layers)):
+        if i == layer_id:
+            x = new_layer(x)
+        else:
+            x = layers[i](x)
+
+    new_model = Model(input=layers[0].input, output=x)
+    return new_model    
+    
+    
         
         
     
 
 if __name__ == "__main__":
-#    parser = build_parser()
-#    options = parser.parse_args()
-#    model_load_path = options.model_load_path
-#    weights_load_path = options.weights_load_path
-#    precent_of_prunning = options.precent_of_prunning
     
-    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
-    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
-    precent_of_prunning = 30
+    parser = build_parser()
+    options = parser.parse_args()
+    model_load_path = options.model_load_path
+    weights_load_path = options.weights_load_path
+    precent_of_prunning = options.precent_of_prunning
+    
+#    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
+#    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
+#    precent_of_prunning = 30
+#    quantization = True
     
     print (model_load_path)
     print (weights_load_path)
@@ -101,7 +147,8 @@ if __name__ == "__main__":
     
         trainable_layers = [layer for layer in saved_model.layers if len(layer.trainable_weights)>0]
         
-            
+        random.shuffle(trainable_layers) 
+        
         for layer in trainable_layers:
             
             try:
@@ -116,13 +163,17 @@ if __name__ == "__main__":
             
             try:
                 saved_model = prune(saved_model, layer, rand=True, no_of_weights=int(precent_of_prunning/100*maxn))
+                if quantization:
+                    saved_model = quantize(saved_model, layer)
             except:
                 print ("could not process", layer.get_config()['name'])
             
             if saved_model.count_params() <= final_size:
                 break
     
-
+    
+    
+    
     print (saved_model.summary())
     
     model_json = saved_model.to_json()
