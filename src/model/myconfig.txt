@@ -1,4 +1,4 @@
---m=/home/atinzad/dietNN/data/raw/model.json
---w=/home/atinzad/dietNN/data/raw/model.h5
+--m=~/dietNN/data/raw/model.json
+--w=~/dietNN/data/raw/model.h5
 --c=30
 --q=False

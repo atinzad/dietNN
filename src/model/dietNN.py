@@ -7,6 +7,7 @@ from keras.utils.vis_utils import plot_model
 from keras import layers
 import copy
 import random
+import os
 
 
 
@@ -116,14 +117,17 @@ if __name__ == "__main__":
     model_load_path = options.model_load_path
     weights_load_path = options.weights_load_path
     precent_of_prunning = options.precent_of_prunning
+    quantization =False
     
-#    model_load_path = "/home/atinzad/dietNN/data/raw/model.json"
-#    weights_load_path = "/home/atinzad/dietNN/data/raw/model.h5"
-#    precent_of_prunning = 30
-#    quantization = True
     
     print (model_load_path)
     print (weights_load_path)
+    
+    if model_load_path[0]=="~":
+        model_load_path = os.path.expanduser(model_load_path)
+        
+    if weights_load_path[0]=="~":
+        weights_load_path = os.path.expanduser(weights_load_path)
     
     # load json and create model
     with open(model_load_path, 'r')as json_file:
@@ -147,6 +151,8 @@ if __name__ == "__main__":
     
         trainable_layers = [layer for layer in saved_model.layers if len(layer.trainable_weights)>0]
         
+        prediction_layer = list(saved_model.layers)[-1]
+        
         random.shuffle(trainable_layers) 
         
         for layer in trainable_layers:
@@ -160,13 +166,13 @@ if __name__ == "__main__":
                 print ("layer is not a dense or conv layer")
                 continue
             
-            
-            try:
-                saved_model = prune(saved_model, layer, rand=True, no_of_weights=int(precent_of_prunning/100*maxn))
-                if quantization:
-                    saved_model = quantize(saved_model, layer)
-            except:
-                print ("could not process", layer.get_config()['name'])
+            if layer.name != prediction_layer.name:
+                try:
+                    saved_model = prune(saved_model, layer, rand=True, no_of_weights=int(precent_of_prunning/100*maxn))
+                    if quantization:
+                        saved_model = quantize(saved_model, layer)
+                except:
+                    print ("could not process", layer.get_config()['name'])
             
             if saved_model.count_params() <= final_size:
                 break
