@@ -48,19 +48,23 @@ git push origin $branch_name
 - Kerassurgeon 0.1.1 (pip install kerassurgeon #for latest version)
 - **Optional**: GraphViz (sudo apt-get install graphviz)
 - **Optional**: Pydot 1.2.4 (pip install pydot #for latest version)
-```
+
 
 ## To install Requisits
+```
 cd $repo_name
 pip install -r requirements.txt
-
+```
 #Once done make sure Tensorflow as running as backend (most likely it is)
 #In python, import keras then go back to shell (this will create keras.json config file)
+```
 python
 import keras
 exit()
+```
 
 #Edit $HOME/.keras/keras.json
+```
 {
     "image_data_format": "channels_last",
     "epsilon": 1e-07,
@@ -71,17 +75,32 @@ exit()
 ```
 
 ## Fetch and create h5 parameter file and json model file
+```
 cd ~/dietNN/data/raw
 python create_models.py #this will create model.json (in KB range) and model.h5 (in MB range)
-
+```
 
 ## Run dietNN.py
-#example on model.json and model.h5 with reduction request of ~1% in footprint
+#example on model.json and model.h5 with reduction request of ~30% in footprint
+```
 cd ~/dietNN/src/model
-python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
+python dietNN.py --m ~/dietNN/data/raw/model.json --w ~/dietNN/data/raw/model.h5 --c 30
+```
+
+#Alternativly, using a myconfig.txt file
+#contents of myconfig.txt file
+```
+--m=~/dietNN/data/raw/model.json
+--w=~/dietNN/data/raw/model.h5
+--c=30
+```
+
+#In the command prompt
+```
+python dietNN.py @myconfig.txt
 ```
 # model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
-#Note that model_small.h5 is ~1% smaller than model.h5
+#Note that model_small.h5 is ~30% smaller than model.h5
 
 ## Build Environment
 - Include instructions of how to launch scripts in the build subfolder
