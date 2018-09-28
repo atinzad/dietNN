@@ -1,6 +1,5 @@
 
 from argparse import ArgumentParser
-from keras.models import load_model
 from keras.models import model_from_json
 from kerassurgeon.operations import delete_channels
 from keras.utils.vis_utils import plot_model
@@ -8,6 +7,8 @@ from keras import layers
 import copy
 import random
 import os
+from keras.preprocessing import image
+from keras import optimizers 
 
 
 
@@ -15,15 +16,15 @@ def build_parser():
     #par = ArgumentParser()
     par = ArgumentParser(fromfile_prefix_chars='@')
     par.add_argument('--m', type=str,
-                     dest='model_load_path', help='filepath to load model in json format', required=True, 
-                     default="/home/atinzad/dietNN/data/raw/model.json")
+                     dest='model_load_path', help='filepath to load model in json format', required=True)
     par.add_argument('--w', type=str,
-                     dest='weights_load_path', help='filepath to load weights in h5 format', required=True,
-                     default="/home/atinzad/dietNN/data/raw/model.h5")
+                     dest='weights_load_path', help='filepath to load weights in h5 format', required=True)
+    par.add_argument('--d', type=str,
+                     dest='dataset_load_path', help='filepath to load validation dataset', required=True)
     par.add_argument('--c', type=int,
-                    dest='precent_of_prunning', help='percent of parameters to be prunned', required=True, default = 30)
+                    dest='precent_of_prunning', help='percent of parameters to be prunned', required=True)
     par.add_argument('--q', type=bool,
-                    dest='invoke quantization', help='True if quantization', required=True, default = False)
+                    dest='invoke_quantization', help='True if quantization', required=True, default = False)
 
     return par
 
@@ -116,18 +117,19 @@ if __name__ == "__main__":
     options = parser.parse_args()
     model_load_path = options.model_load_path
     weights_load_path = options.weights_load_path
+    dataset_load_path = options.dataset_load_path
     precent_of_prunning = options.precent_of_prunning
     quantization =False
     
-    
-    print (model_load_path)
-    print (weights_load_path)
     
     if model_load_path[0]=="~":
         model_load_path = os.path.expanduser(model_load_path)
         
     if weights_load_path[0]=="~":
         weights_load_path = os.path.expanduser(weights_load_path)
+    
+    if dataset_load_path[0]=="~":
+        dataset_load_path = os.path.expanduser(dataset_load_path)
     
     # load json and create model
     with open(model_load_path, 'r')as json_file:
@@ -145,7 +147,14 @@ if __name__ == "__main__":
     
     saved_model = copy.copy(loaded_model)
     
+    for layer in saved_model.layers:
+        layer.trainable = True
+    
     print (saved_model.summary())
+    img_size=224
+    batch_size=10
+    
+    saved_model.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(),metrics=["accuracy"])
     
     while saved_model.count_params() > final_size:
     
@@ -174,6 +183,17 @@ if __name__ == "__main__":
                 except:
                     print ("could not process", layer.get_config()['name'])
             
+            test_datagen = image.ImageDataGenerator(rescale=1. / 255)
+            
+            validation_generator = test_datagen.flow_from_directory(
+                    dataset_load_path,
+                    target_size=(img_size,img_size),
+                    batch_size=batch_size,
+                    class_mode='categorical')
+            
+#            saved_model.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(),metrics=["accuracy"])
+#            saved_model.evaluate_generator(generator=validation_generator)
+            
             if saved_model.count_params() <= final_size:
                 break
     
@@ -181,6 +201,8 @@ if __name__ == "__main__":
     
     
     print (saved_model.summary())
+    saved_model.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(),metrics=["accuracy"])
+    print(saved_model.evaluate_generator(generator=validation_generator))
     
     model_json = saved_model.to_json()
     with open("model_small.json", "w") as json_file:

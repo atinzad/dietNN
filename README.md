@@ -48,19 +48,23 @@ git push origin $branch_name
 - Kerassurgeon 0.1.1 (pip install kerassurgeon #for latest version)
 - **Optional**: GraphViz (sudo apt-get install graphviz)
 - **Optional**: Pydot 1.2.4 (pip install pydot #for latest version)
-```
+
 
 ## To install Requisits
+```
 cd $repo_name
 pip install -r requirements.txt
-
+```
 #Once done make sure Tensorflow as running as backend (most likely it is)
 #In python, import keras then go back to shell (this will create keras.json config file)
+```
 python
 import keras
 exit()
+```
 
 #Edit $HOME/.keras/keras.json
+```
 {
     "image_data_format": "channels_last",
     "epsilon": 1e-07,
@@ -71,84 +75,30 @@ exit()
 ```
 
 ## Fetch and create h5 parameter file and json model file
+```
 cd ~/dietNN/data/raw
 python create_models.py #this will create model.json (in KB range) and model.h5 (in MB range)
-
+```
 
 ## Run dietNN.py
-#example on model.json and model.h5 with reduction request of ~1% in footprint
+#example on model.json and model.h5 with reduction request of ~30% in footprint
+```
 cd ~/dietNN/src/model
-python dietNN.py --m [path of model.json] --w [path of model.h5] --c 1
+python dietNN.py --m ~/dietNN/data/raw/model.json --w ~/dietNN/data/raw/model.h5 --c 30
+```
+
+#Alternativly, using a myconfig.txt file
+#contents of myconfig.txt file
+```
+--m=~/dietNN/data/raw/model.json
+--w=~/dietNN/data/raw/model.h5
+--c=30
+```
+
+#In the command prompt
+```
+python dietNN.py @myconfig.txt
 ```
 # model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
-#Note that model_small.h5 is ~1% smaller than model.h5
-
-## Build Environment
-- Include instructions of how to launch scripts in the build subfolder
-- Build scripts can include shell scripts or python setup.py files
-- The purpose of these scripts is to build a standalone environment, for running the code in this repository
-- The environment can be for local use, or for use in a cloud environment
-- If using for a cloud environment, commands could include CLI tools from a cloud provider (i.e. gsutil from Google Cloud Platform)
-
-# Example
-
-# Step 1
-# Step 2
-```
-
-## Configs
-- We recommond using either .yaml or .txt for your config files, not .json
-- **DO NOT STORE CREDENTIALS IN THE CONFIG DIRECTORY!!**
-- If credentials are needed, use environment variables or HashiCorp's [Vault](https://www.vaultproject.io/)
-
-
-## Test
-- Include instructions for how to run all tests after the software is installed
-```
-# Example
-
-# Step 1
-# Step 2
-```
-
-## Run Inference
-- Include instructions on how to run inference
-- i.e. image classification on a single image for a CNN deep learning project
-```
-# Example
-
-# Step 1
-# Step 2
-```
-
-## Build Model
-- Include instructions of how to build the model
-- This can be done either locally or on the cloud
-```
-# Example
-
-# Step 1
-# Step 2
-```
-
-## Serve Model
-- Include instructions of how to set up a REST or RPC endpoint 
-- This is for running remote inference via a custom model
-```
-# Example
-
-# Step 1
-# Step 2
-```
-
-## Analysis
-- Include some form of EDA (exploratory data analysis)
-- And/or include benchmarking of the model and results
-```
-# Example
-
-# Step 1
-# Step 2
-```
-
+#Note that model_small.h5 is ~30% smaller than model.h5
 
