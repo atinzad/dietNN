@@ -1,0 +1,5 @@
+--t=~/dietNN/data/raw/catdog/train
+--n=2
+--v=~/dietNN/data/raw/catdog/test
+--m=~/dietNN/data/raw/model.json
+--w=~/dietNN/data/raw/model.h5

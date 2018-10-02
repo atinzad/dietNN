@@ -101,5 +101,8 @@ python dietNN.py @myconfig.txt
 ```
 # model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
 #Note that model_small.h5 is ~30% smaller than model.h5
+<<<<<<< HEAD
+=======
 
+>>>>>>> 22c0db7afdca38d7bca9700db9f1289e3d06f26a
 

@@ -1,4 +1,4 @@
 --m=~/dietNN/data/raw/model.json
 --w=~/dietNN/data/raw/model.h5
---c=30
+--c=1
 --q=False
