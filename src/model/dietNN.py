@@ -86,18 +86,21 @@ def prune_genetic(model, layer, validation_generator, no_of_weights=1, loops=1):
         try:
             model_try = delete_channels(model, layer, weights)
         except:
+            print ("broke at",i)
             break
         
         model_try.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(),metrics=["accuracy"])
         results.append(model_try.evaluate_generator(generator=validation_generator, steps=10)[1])
-        weights_configs.append([weights])
+        weights_configs.append(weights)
         models.append(copy.copy(model_try))
     
    
     try:
         best_i = np.argmax(results)
         model = delete_channels(model, layer, weights_configs[best_i])
+        print (results)
     except:
+        print ("No update occurend for layer", layer.name)
         pass
         
     return model
@@ -232,7 +235,8 @@ if __name__ == "__main__":
             
             if layer.name != prediction_layer.name:
                 try:
-                    saved_model = prune_genetic(saved_model, layer,  validation_generator, no_of_weights=int(precent_of_prunning/100*maxn), loops=5)
+                    saved_model = prune_genetic(saved_model, layer,  validation_generator, no_of_weights=int(precent_of_prunning/100*maxn), loops=20)
+                    print (saved_model.count_params())
                     #saved_model = prune(saved_model, layer, rand=True, no_of_weights=int(precent_of_prunning/100*maxn))
                     #if quantization:
                     #    saved_model = quantize(saved_model, layer)
