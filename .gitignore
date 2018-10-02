@@ -1,0 +1,9 @@
+*.h5
+*.hdf5
+*.json
+*.png
+*.jpg
+
+catdog/
+
+mushrooms/
