@@ -2,6 +2,7 @@
 from argparse import ArgumentParser
 from keras.models import model_from_json
 from kerassurgeon.operations import delete_channels
+from kerassurgeon import identify
 from keras.utils.vis_utils import plot_model
 from keras import layers
 import copy
@@ -23,13 +24,11 @@ def build_parser():
                      dest='dataset_load_path', help='filepath to load validation dataset', required=True)
     par.add_argument('--c', type=int,
                     dest='precent_of_prunning', help='percent of parameters to be prunned', required=True)
-    par.add_argument('--q', type=bool,
-                    dest='invoke_quantization', help='True if quantization', required=True, default = False)
 
     return par
 
 
-#python dietNN.py --m /home/atinzad/dietNN/data/raw/model.json --w /home/atinzad/dietNN/data/raw/model.h5 --c 30
+#python dietNN.py --m ~/dietNN/data/raw/model.json --w ~/dietNN/data/raw/model.h5 --d ~/dietNN/data/raw/ --c 30
     
 
 def prune(model, layer, rand=True,no_of_weights=0, weights=[]):
@@ -66,7 +65,7 @@ def prune(model, layer, rand=True,no_of_weights=0, weights=[]):
     return model
 
 
-def prune_genetic(model, layer, validation_generator, no_of_weights=1, loops=1):
+def prune_stoch(model, layer, validation_generator, no_of_weights=1, loops=1):
     try:
         if 'units' in layer.get_config():
             maxn=layer.get_config()['units']
@@ -86,23 +85,37 @@ def prune_genetic(model, layer, validation_generator, no_of_weights=1, loops=1):
         try:
             model_try = delete_channels(model, layer, weights)
         except:
+            print ("broke at",i)
             break
         
         model_try.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(),metrics=["accuracy"])
         results.append(model_try.evaluate_generator(generator=validation_generator, steps=10)[1])
-        weights_configs.append([weights])
+        weights_configs.append(weights)
         models.append(copy.copy(model_try))
     
    
     try:
         best_i = np.argmax(results)
         model = delete_channels(model, layer, weights_configs[best_i])
+        print (results)
     except:
+        print ("No update occurend for layer", layer.name)
         pass
         
     return model
 
-                
+
+def apoz_prune(model, layer, validation_generator):
+    print ("identifiying channels")
+    apoz = identify.get_apoz(model, layer,validation_generator)
+    high_apoz_channels = identify.high_apoz(apoz)
+    try:
+        model= delete_channels(model, layer, high_apoz_channels)
+    except:
+        pass
+    
+    return model 
+                 
             
 def quantize(model, layer) :
     weights = layer.get_weights()
@@ -123,9 +136,6 @@ def quantize(model, layer) :
     
     model = replace_intermediate_layer_in_keras(model, my_i, new_layer)
     
-    
-    #model.layers[my_i].set_weights(new_weights)
-    #model.get_layer(name=layer.name).set_weights(new_weights)
     return model
     
     
@@ -144,29 +154,23 @@ def replace_intermediate_layer_in_keras(model, layer_id, new_layer):
     new_model = Model(input=layers[0].input, output=x)
     return new_model    
     
-    
-        
-        
+
     
 
 if __name__ == "__main__":
     
-#    parser = build_parser()
-#    options = parser.parse_args()
-#    model_load_path = options.model_load_path
-#    weights_load_path = options.weights_load_path
-#    dataset_load_path = options.dataset_load_path
-#    precent_of_prunning = options.precent_of_prunning
-#    quantization =False
-    
-    
+    parser = build_parser()
+    options = parser.parse_args()
+    model_load_path = options.model_load_path
+    weights_load_path = options.weights_load_path
+    dataset_load_path = options.dataset_load_path
+    precent_of_prunning = options.precent_of_prunning
 
-    
-    model_load_path = '~/dietNN/src/preprocess/catdog_model.json'
-    weights_load_path = '~/dietNN/src/preprocess/catdog_model.h5'
-    dataset_load_path = '~/dietNN/data/raw/catdog/test'
-    precent_of_prunning = 30
-    quantization =False
+   
+#    model_load_path = '~/dietNN/src/preprocess/catdog_model.json'
+#    weights_load_path = '~/dietNN/src/preprocess/catdog_model.h5'
+#    dataset_load_path = '~/dietNN/data/raw/catdog/test'
+#    precent_of_prunning = 10
     
     
     if model_load_path[0]=="~":
@@ -211,8 +215,11 @@ if __name__ == "__main__":
                     batch_size=batch_size,
                     class_mode='categorical')
     
+    data_to_plot_pruned=[0]
+    data_to_plot_accuracy=[saved_model.evaluate_generator(generator=validation_generator, steps=20)[1]]
     while saved_model.count_params() > final_size:
-    
+        
+        
         trainable_layers = [layer for layer in saved_model.layers if len(layer.trainable_weights)>0]
         
         prediction_layer = list(saved_model.layers)[-1]
@@ -220,7 +227,7 @@ if __name__ == "__main__":
         random.shuffle(trainable_layers) 
         
         for layer in trainable_layers:
-            
+            current_count = saved_model.count_params()
             try:
                 if 'units' in layer.get_config():
                     maxn=layer.get_config()['units']
@@ -232,19 +239,17 @@ if __name__ == "__main__":
             
             if layer.name != prediction_layer.name:
                 try:
-                    saved_model = prune_genetic(saved_model, layer,  validation_generator, no_of_weights=int(precent_of_prunning/100*maxn), loops=5)
-                    #saved_model = prune(saved_model, layer, rand=True, no_of_weights=int(precent_of_prunning/100*maxn))
-                    #if quantization:
-                    #    saved_model = quantize(saved_model, layer)
+                    #saved_model = prune_stoch(saved_model, layer,  validation_generator, no_of_weights=int(precent_of_prunning/100*maxn), loops=20)
+                    saved_model = apoz_prune(saved_model, layer, validation_generator)
+                    data_to_plot_pruned.append(current_count-saved_model.count_params())
+                    acc = saved_model.evaluate_generator(generator=validation_generator, steps=20)[1]
+                    data_to_plot_accuracy.append(acc)
+                    print (saved_model.count_params())
+                    
+
                 except:
                     print ("could not process", layer.get_config()['name'])
             
-            
-            
-            
-            
-#            saved_model.compile(loss="categorical_crossentropy", optimizer=optimizers.Adam(),metrics=["accuracy"])
-#            saved_model.evaluate_generator(generator=validation_generator)
             
             if saved_model.count_params() <= final_size:
                 break

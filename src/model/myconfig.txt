@@ -1,4 +1,4 @@
---m=~/dietNN/data/raw/model.json
---w=~/dietNN/data/raw/model.h5
+--m=~/dietNN/data/raw/mushroom_model.json
+--w=~/dietNN/data/raw/mushroom_model.h5
+--d=~/dietNN/data/raw/mushrooms/test
 --c=1
---q=False

@@ -2,4 +2,4 @@
 --w=~/dietNN/src/preprocess/catdog_model.h5
 --d=~/dietNN/data/raw/catdog/test
 --c=30
---q=False
+

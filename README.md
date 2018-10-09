@@ -1,21 +1,7 @@
 # DietNN
-Tool to reduce the size of Neural Networks
+Tool to reduce the size of Neural Networks models
 
-ToDo:
-- Train Models in Keras (get accuracy)
-- Run Model (inference)
-- Add data (imagenet) to the pipeline
-- Run data in dietNN to check accuracy
-- Have examples in tests
-- Refactor dienNN.py
-
-## Motivation for this project format:
-- **src** : Put all source code for production within structured directory
-- **tests** : Put all source code for testing in an easy to find location
-- **configs** : Enable modification of all preset variables within single directory (consisting of one or many config files for separate tasks)
-- **data** : Include example a small amount of data in the Github repository so tests can be run to validate installation
-- **build** : Include scripts that automate building of a standalone environment
-- **static** : Any images or content to include in the README or web framework if part of the pipeline
+https://platform.insightdata.com/projects/deitnn-making-your-neural-network-models-lean
 
 ## Setup
 Clone repository and update python path
@@ -92,10 +78,11 @@ python dietNN.py --m ~/dietNN/data/raw/model.json --w ~/dietNN/data/raw/model.h5
 ```
 --m=~/dietNN/data/raw/model.json
 --w=~/dietNN/data/raw/model.h5
+--d=~/dietNN/data/raw/dataset/test
 --c=30
 ```
 
-#In the command prompt
+#Then, in the command prompt
 ```
 python dietNN.py @myconfig.txt
 ```
