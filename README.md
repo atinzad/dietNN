@@ -41,15 +41,15 @@ git push origin $branch_name
 cd $repo_name
 pip install -r requirements.txt
 ```
-#Once done make sure Tensorflow as running as backend (most likely it is)
-#In python, import keras then go back to shell (this will create keras.json config file)
+Once done make sure Tensorflow as running as backend (most likely it is)
+In python, import keras then go back to shell (this will create keras.json config file)
 ```
 python
 import keras
 exit()
 ```
 
-#Edit $HOME/.keras/keras.json
+Edit $HOME/.keras/keras.json
 ```
 {
     "image_data_format": "channels_last",
@@ -67,14 +67,14 @@ python create_models.py #this will create model.json (in KB range) and model.h5 
 ```
 
 ## Run dietNN.py
-#example on model.json and model.h5 with reduction request of ~30% in footprint
+example on model.json and model.h5 with reduction request of ~30% in footprint
 ```
 cd ~/dietNN/src/model
 python dietNN.py --m ~/dietNN/data/raw/model.json --w ~/dietNN/data/raw/model.h5 --c 30
 ```
 
-#Alternativly, using a myconfig.txt file
-#contents of myconfig.txt file
+Alternativly, using a myconfig.txt file
+contents of myconfig.txt file
 ```
 --m=~/dietNN/data/raw/model.json
 --w=~/dietNN/data/raw/model.h5
@@ -82,12 +82,12 @@ python dietNN.py --m ~/dietNN/data/raw/model.json --w ~/dietNN/data/raw/model.h5
 --c=30
 ```
 
-#Then, in the command prompt
+Then, in the command prompt
 ```
 python dietNN.py @myconfig.txt
 ```
-#model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
+model_small.json and model_small.h5 will be produced and stored in ~/dietNN/src/model folder
 
-#Note that model_small.h5 is ~30% smaller than model.h5
+Note that model_small.h5 is ~30% smaller than model.h5
 
 
