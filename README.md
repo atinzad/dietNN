@@ -1,7 +1,8 @@
 # DietNN
 Tool to reduce the size of Neural Networks models
 
-https://platform.insightdata.com/projects/deitnn-making-your-neural-network-models-lean
+https://bit.ly/2IEgIRj
+
 
 ## Setup
 Clone repository and update python path
@@ -41,8 +42,8 @@ git push origin $branch_name
 cd $repo_name
 pip install -r requirements.txt
 ```
-Once done make sure Tensorflow as running as backend (most likely it is)
-In python, import keras then go back to shell (this will create keras.json config file)
+Once done make sure Tensorflow is running as backend (most likely it is)
+In python, import keras, then go back to shell (this will create keras.json config file)
 ```
 python
 import keras
