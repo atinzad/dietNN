@@ -1,7 +1,7 @@
 # DietNN
 Tool to reduce the size of Neural Networks models
 
-https://bit.ly/2IEgIRj
+[link](https://bit.ly/2IEgIRj) to presentation
 
 
 ## Setup
